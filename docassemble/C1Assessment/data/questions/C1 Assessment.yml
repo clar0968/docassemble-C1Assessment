@@ -1,0 +1,135 @@
+---
+question: Welcome!
+subquestion: |
+  This application provides a quick and easy way to complete a **Federal Court Form**
+  
+  *disclaimer: form must be checked by a lawyer. This app does not give legal advice*
+mandatory: True
+buttons:
+  - Continue: continue
+  - Exit: exit
+    url: https://flinders.edu.au
+---
+question: Court Choice
+subquestion: |
+  Please select the court for which the file is to be completed
+field: court_choice
+choices:
+  - Supreme Court
+  - District Court
+  - Magistrates Court
+  - Federal Court
+  - Federal Circuit Court
+mandatory: True
+---
+mandatory: True
+code: |
+  if (court_choice != 'Federal Court'):
+    if (court_choice != 'Federal Circuit Court'):
+      invalid
+---
+mandatory: True
+question: Form 1
+fields:
+  - District Registry: dreg
+    choices:
+      - South Australia
+      - Victoria
+      - Western Australia
+      - Queensland
+      - Northern Territory
+      - New South Wales
+      - Tasmania
+  - Division: div
+    choices:
+      - Corporations
+      - Criminal
+      - Employment
+      - General
+  - Applicant: app
+    hint: Full name of Applicant
+  - Respondent: res
+    hint: Full name of Respondent
+  - Date: date
+    datatype: date
+  - Who is Filling in This Form?: fillingForm
+    choices:
+      - Applicant
+      - Lawyer of Applicant
+      - Respondent
+  - Lawyer Name: lName
+    show if:
+      variable: fillingForm
+      required: false
+      is: Lawyer of Applicant
+---
+mandatory: True
+code: | 
+  if fillingForm == 'Applicant':
+    message1 = 'Signed by ' + app
+    message2 = 'Applicant'
+  elif fillingForm == 'Respondent':
+    message1 = 'Signed by ' + res
+    message2 =  'Respondent'
+  else:
+    message1 = 'Signed by ' + lName
+    message2 = 'Lawyer for the Applicant'
+---
+mandatory: True
+question: | 
+  **${app} vs ${res}**
+subquestion: |
+  
+  Question                    | Answer
+  ----------------------------|--------------------
+  Court                       | ${court_choice}
+  District Registry           | ${dreg}
+  Division                    | ${div}
+  Applicant                   | ${app}
+  Respondent                  | ${res}
+  Date                        | ${date}
+  Person who completed form   | ${fillingForm}
+
+attachments:
+  - name: Form 1
+    filename: form_1
+    valid formats:
+      - pdf
+    content: |
+      [BOLDCENTER] ${app} vs {res}[BR]
+      
+      ${court_choice}[BR]
+      District Registry: ${dreg}[BR]
+      Division: ${div}[BR]
+      
+      &nbsp;
+      
+      **${app}**[BR]
+      Applicant[BR]
+      
+      &nbsp;
+      
+      **${res}**[BR]
+      Respondent[BR]
+      
+      &nbsp;
+      &nbsp;
+      
+      Date: ${date}[BR]
+      &nbsp;
+      
+      [FLUSHLEFT]________________________________________[BR]
+      ${message1}[BR]
+      ${message2}
+     
+     
+buttons:
+  - Exit: logout
+    url: https://www.financialcounsellingaustralia.org.au/about-fca/
+  
+---
+event: invalid
+question: Invalid Court!
+subquestion: |
+  Unfortunately, this app is only available to prepare forms for the FCA and FCCT
+---
